@@ -73,10 +73,10 @@ export interface PostRepository {
 ```
 
 ```typescript
-// src/core/domain/account/ports/sessionManager.ts
+// src/core/domain/file/ports/storageManager.ts
 
-export interface SessionManager {
-  get(): Promise<Result<SessionData, SessionManagerError>>;
+export interface StorageManager {
+  uploadFile(file: UploadFileParams): Promise<Result<File, StorageError>>;
   // Other session management methods...
 }
 ```
