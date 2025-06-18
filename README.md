@@ -1,1 +1,1 @@
-# Next.js template for Claude Code
+# Web template for Agent
