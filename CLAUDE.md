@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `pnpm run lint` - Lint code with Biome
-- `pnpm run lint:fix` - Lint code with Biome and fix issues
-- `pnpm run format` - Format code with Biome
+- `pnpm lint` - Lint code with Biome
+- `pnpm lint:fix` - Lint code with Biome and fix issues
+- `pnpm format` - Format code with Biome
 - `pnpm typecheck` - Type check code with tsc
-- `pnpm run test` - Run tests with Vitest
+- `pnpm test` - Run tests with Vitest
 
 ## Development Workflow
 
