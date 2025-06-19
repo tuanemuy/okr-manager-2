@@ -1,4 +1,4 @@
-# AI Agent Web Development Boilerplate
+# Agentic Web Development Boilerplate
 
 A modern web application boilerplate designed for AI Agent development, built with Next.js 15, TypeScript, and hexagonal architecture principles.
 
