@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { err, ok, type Result } from "neverthrow";
 import type {
   PasswordHasher,
