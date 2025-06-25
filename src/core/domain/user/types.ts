@@ -55,6 +55,15 @@ export const userProfileSchema = userSchema.omit({
 
 export type UserProfile = z.infer<typeof userProfileSchema>;
 
+// User with authentication info (includes hashed password)
+export const userWithAuthSchema = userSchema.extend({
+  hashedPassword: z.string(),
+  passwordResetToken: z.string().nullable().optional(),
+  passwordResetExpiresAt: z.date().nullable().optional(),
+});
+
+export type UserWithAuth = z.infer<typeof userWithAuthSchema>;
+
 // List users query
 export const listUsersQuerySchema = z.object({
   pagination: paginationSchema,

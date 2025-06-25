@@ -179,7 +179,7 @@ export const teamInvitations = sqliteTable("team_invitations", {
 });
 
 // Objectives table
-export const objectives: any = sqliteTable("objectives", {
+export const objectives = sqliteTable("objectives", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => uuidv7()),
@@ -190,7 +190,7 @@ export const objectives: any = sqliteTable("objectives", {
     .notNull()
     .references(() => users.id),
   teamId: text("team_id").references(() => teams.id),
-  parentId: text("parent_id").references(() => objectives.id),
+  parentId: text("parent_id"),
   startDate: integer("start_date", { mode: "timestamp" }).notNull(),
   endDate: integer("end_date", { mode: "timestamp" }).notNull(),
   status: text("status", {

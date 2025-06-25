@@ -11,8 +11,10 @@ import {
   type UpdateUserParams,
   type User,
   type UserProfile,
+  type UserWithAuth,
   userProfileSchema,
   userSchema,
+  userWithAuthSchema,
 } from "@/core/domain/user/types";
 import { validate } from "@/lib/validation";
 import type { Database } from "./client";
@@ -89,6 +91,30 @@ export class DrizzleSqliteUserRepository implements UserRepository {
       });
     } catch (error) {
       return err(new UserRepoError("Failed to find user by email", error));
+    }
+  }
+
+  async findByEmailForAuth(
+    email: string,
+  ): Promise<Result<UserWithAuth | null, UserRepositoryError>> {
+    try {
+      const result = await this.db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (result.length === 0) {
+        return ok(null);
+      }
+
+      return validate(userWithAuthSchema, result[0]).mapErr((error) => {
+        return new UserRepoError("Invalid user data", error);
+      });
+    } catch (error) {
+      return err(
+        new UserRepoError("Failed to find user by email for auth", error),
+      );
     }
   }
 

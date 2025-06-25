@@ -1,5 +1,12 @@
 import { z } from "zod/v4";
+import { BcryptPasswordHasher } from "@/core/adapters/bcrypt/passwordHasher";
 import { getDatabase } from "@/core/adapters/drizzleSqlite/client";
+import { DrizzleSqliteOkrRepository } from "@/core/adapters/drizzleSqlite/okrRepository";
+import { DrizzleSqliteRoleRepository } from "@/core/adapters/drizzleSqlite/roleRepository";
+import { DrizzleSqliteSessionRepository } from "@/core/adapters/drizzleSqlite/sessionRepository";
+import { DrizzleSqliteTeamRepository } from "@/core/adapters/drizzleSqlite/teamRepository";
+import { DrizzleSqliteUserRepository } from "@/core/adapters/drizzleSqlite/userRepository";
+import { MockEmailService } from "@/core/adapters/mock/emailService";
 import type { Context } from "@/core/application/context";
 
 export const envSchema = z.object({
@@ -18,9 +25,14 @@ if (!env.success) {
 }
 
 const db = getDatabase(env.data.SQLITE_FILE_PATH);
-// const ${entity}Repository = new DrizzleSqlite${Entity}Repository(db);
 
 export const context: Context = {
   publicUrl: env.data.NEXT_PUBLIC_URL,
-  // ${entity}Repository,
+  userRepository: new DrizzleSqliteUserRepository(db),
+  sessionRepository: new DrizzleSqliteSessionRepository(db),
+  teamRepository: new DrizzleSqliteTeamRepository(db),
+  roleRepository: new DrizzleSqliteRoleRepository(db),
+  okrRepository: new DrizzleSqliteOkrRepository(db),
+  passwordHasher: new BcryptPasswordHasher(),
+  emailService: new MockEmailService(),
 };

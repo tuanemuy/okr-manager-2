@@ -6,6 +6,7 @@ import type {
   UpdateUserParams,
   User,
   UserProfile,
+  UserWithAuth,
 } from "../types";
 
 export class UserRepositoryError extends AnyError {
@@ -18,6 +19,10 @@ export interface UserRepository {
   findById(id: string): Promise<Result<User | null, UserRepositoryError>>;
 
   findByEmail(email: string): Promise<Result<User | null, UserRepositoryError>>;
+
+  findByEmailForAuth(
+    email: string,
+  ): Promise<Result<UserWithAuth | null, UserRepositoryError>>;
 
   findByEmailVerificationToken(
     token: string,
