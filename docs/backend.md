@@ -6,13 +6,10 @@
 // src/core/domain/post/types.ts
 
 import { z } from "zod/v4";
-import { paginationSchema } from "@/lib/pagination.ts";
-
-export const postIdSchema = z.uuid();
-export type PostId = z.infer<typeof postIdSchema>;
+import { paginationSchema } from "@/lib/pagination";
 
 export const postSchema = z.object({
-  id: postIdSchema,
+  id: z.uuid(),
   content: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -25,7 +22,7 @@ export const listPostQuerySchema = z.object({
   pagination: paginationSchema,
   filter: z
     .object({
-      text: z.string().optional(),
+      keyword: z.string().optional(),
     })
     .optional(),
 });
@@ -92,7 +89,7 @@ export class DrizzleSqlitePostRepository implements PostRepository {
     const offset = (pagination.page - 1) * pagination.limit;
 
     const filters = [
-      filter?.text ? like(posts.text, `%${filter.text}%`) : undefined,
+      filter?.keyword ? like(posts.content, `%${filter.keyword}%`) : undefined,
     ].filter((filter) => filter !== undefined);
 
     try {
@@ -109,12 +106,12 @@ export class DrizzleSqlitePostRepository implements PostRepository {
           .where(and(...filters)),
       ]);
 
-      return {
+      return ok({
         items: items
           .map((item) => validate(postSchema, item).unwrapOr(null))
           .filter((item) => item !== null),
         count: Number(countResult[0].count),
-      };
+      });
     } catch (error) {
       return err(new RepositoryError("Failed to list posts", error));
     }
