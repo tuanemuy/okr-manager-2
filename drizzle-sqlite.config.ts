@@ -1,23 +1,17 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
-const fileName = process.env.DATABASE_FILE_NAME;
+const path = process.env.SQLITE_FILE_PATH;
 
-if (!fileName) {
-  throw new Error("DATABASE_FILE_NAME environment variable is not set.");
+if (!path) {
+  throw new Error("SQLITE_FILE_PATH environment variable is not set.");
 }
-
-const filePath = path.join(
-  import.meta.dirname,
-  "src/core/adapters/drizzleSqlite",
-  fileName,
-);
 
 export default defineConfig({
   out: "./src/core/adapters/drizzleSqlite/migrations",
   schema: "./src/core/adapters/drizzleSqlite/schema.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: `file:${filePath}`,
+    url: `file:${path}`,
   },
 });
