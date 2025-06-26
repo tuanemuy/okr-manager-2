@@ -1,23 +1,16 @@
 import { v7 as uuidv7 } from "uuid";
 import { beforeEach, describe, expect, it } from "vitest";
 import { MockEmailService } from "@/core/adapters/mock/emailService";
+import { MockOkrRepository } from "@/core/adapters/mock/okrRepository";
 import { MockPasswordHasher } from "@/core/adapters/mock/passwordHasher";
 import { MockRoleRepository } from "@/core/adapters/mock/roleRepository";
 import { MockSessionRepository } from "@/core/adapters/mock/sessionRepository";
+import { MockTeamRepository } from "@/core/adapters/mock/teamRepository";
 import { MockUserRepository } from "@/core/adapters/mock/userRepository";
 import type { Session } from "@/core/domain/auth/types";
 import type { Context } from "../context";
 import { ApplicationError } from "./register";
 import { type ValidateSessionInput, validateSession } from "./validateSession";
-
-// Mock implementations for missing repositories
-class MockTeamRepository {
-  // Minimal implementation for testing - extend as needed
-}
-
-class MockOkrRepository {
-  // Minimal implementation for testing - extend as needed
-}
 
 describe("validateSession", () => {
   let context: Context;
@@ -33,11 +26,9 @@ describe("validateSession", () => {
       userRepository: mockUserRepository,
       sessionRepository: mockSessionRepository,
       passwordHasher: new MockPasswordHasher(),
-      // biome-ignore lint/suspicious/noExplicitAny: Test context requires full interface
-      teamRepository: new MockTeamRepository() as any,
+      teamRepository: new MockTeamRepository(),
       roleRepository: new MockRoleRepository(),
-      // biome-ignore lint/suspicious/noExplicitAny: Test context requires full interface
-      okrRepository: new MockOkrRepository() as any,
+      okrRepository: new MockOkrRepository(),
       emailService: new MockEmailService(),
     };
 
