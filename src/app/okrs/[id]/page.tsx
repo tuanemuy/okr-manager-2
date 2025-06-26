@@ -2,6 +2,7 @@ import { Edit, Plus, Settings, Target, Trash2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getObjectiveData } from "@/actions/okr";
 import { CreateKeyResultDialog } from "@/components/okr/CreateKeyResultDialog";
+import { DeleteKeyResultDialog } from "@/components/okr/DeleteKeyResultDialog";
 import { UpdateKeyResultDialog } from "@/components/okr/UpdateKeyResultDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -201,9 +202,14 @@ export default async function OKRDetailPage({ params }: OKRDetailPageProps) {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </UpdateKeyResultDialog>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <DeleteKeyResultDialog
+                          keyResultId={keyResult.id}
+                          keyResultTitle={keyResult.title}
+                        >
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </DeleteKeyResultDialog>
                       </div>
                     </div>
 

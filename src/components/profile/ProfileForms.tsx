@@ -21,7 +21,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const updateProfileSchema = z.object({
   name: z.string().min(1, "名前を入力してください"),
-  email: z.string().email("有効なメールアドレスを入力してください"),
 });
 
 const changePasswordSchema = z
@@ -55,7 +54,6 @@ export function ProfileForms({ user }: ProfileFormsProps) {
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: user.name,
-      email: user.email,
     },
   });
 
@@ -70,7 +68,7 @@ export function ProfileForms({ user }: ProfileFormsProps) {
 
   const [profileState, profileAction, isProfilePending] = useActionState(
     updateProfileAction,
-    { input: { name: user.name, email: user.email }, error: null },
+    { input: { name: user.name }, error: null },
   );
 
   const [passwordState, passwordAction, isPasswordPending] = useActionState(
@@ -81,7 +79,6 @@ export function ProfileForms({ user }: ProfileFormsProps) {
   const onProfileSubmit = (data: UpdateProfileInput) => {
     const formData = new FormData();
     formData.append("name", data.name);
-    formData.append("email", data.email);
 
     startTransition(() => {
       profileAction(formData);
@@ -138,23 +135,18 @@ export function ProfileForms({ user }: ProfileFormsProps) {
                   )}
                 />
 
-                <FormField
-                  control={profileForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>メールアドレス</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="example@example.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div>
+                  <FormLabel>メールアドレス</FormLabel>
+                  <Input
+                    type="email"
+                    value={user.email}
+                    disabled
+                    className="bg-gray-50"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    メールアドレスの変更はサポートされていません
+                  </p>
+                </div>
 
                 {!!profileState.error && (
                   <div className="text-red-600 text-sm">
