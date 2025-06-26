@@ -34,7 +34,7 @@ type SignupInput = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
   const form = useForm<SignupInput>({
-    resolver: zodResolver(signupSchema) as any,
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -139,7 +139,7 @@ export default function SignupPage() {
                 )}
               />
 
-              {formState.error && (
+              {!!formState.error && (
                 <div className="text-red-600 text-sm">
                   登録に失敗しました。入力内容を確認してください。
                 </div>

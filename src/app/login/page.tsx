@@ -33,7 +33,7 @@ type LoginInput = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema) as any,
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -101,7 +101,7 @@ export default function LoginPage() {
                 )}
               />
 
-              {formState.error && (
+              {!!formState.error && (
                 <div className="text-red-600 text-sm">
                   ログインに失敗しました。メールアドレスとパスワードを確認してください。
                 </div>

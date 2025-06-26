@@ -1,5 +1,5 @@
-export interface FormState<T = any, R = any> {
+export interface FormState<T = unknown, R = unknown> {
   input: T;
   result?: R;
-  error: any;
+  error: unknown;
 }

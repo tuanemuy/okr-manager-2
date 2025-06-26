@@ -56,7 +56,7 @@ export function CreateKeyResultDialog({
   const [open, setOpen] = useState(false);
 
   const form = useForm<CreateKeyResultInput>({
-    resolver: zodResolver(createKeyResultSchema) as any,
+    resolver: zodResolver(createKeyResultSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -250,7 +250,7 @@ export function CreateKeyResultDialog({
               />
             </div>
 
-            {formState.error && (
+            {!!formState.error && (
               <div className="text-red-600 text-sm">
                 Key Resultの作成に失敗しました。入力内容を確認してください。
               </div>

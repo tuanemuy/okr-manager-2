@@ -2,14 +2,8 @@
 
 // Removed revalidatePath import as it's not exported from next/navigation
 import { z } from "zod/v4";
-import {
-  type ChangePasswordInput,
-  changePassword,
-} from "@/core/application/user/changePassword";
-import {
-  type UpdateProfileInput,
-  updateProfile,
-} from "@/core/application/user/updateProfile";
+import { changePassword } from "@/core/application/user/changePassword";
+import { updateProfile } from "@/core/application/user/updateProfile";
 import { requireAuth } from "@/lib/auth";
 import type { FormState } from "@/lib/formState";
 import { validate } from "@/lib/validation";

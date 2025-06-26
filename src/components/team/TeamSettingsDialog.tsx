@@ -50,7 +50,7 @@ export function TeamSettingsDialog({
   const [open, setOpen] = useState(false);
 
   const form = useForm<UpdateTeamInput>({
-    resolver: zodResolver(updateTeamSchema) as any,
+    resolver: zodResolver(updateTeamSchema),
     defaultValues: {
       name: team.name,
       description: team.description || "",
@@ -123,7 +123,7 @@ export function TeamSettingsDialog({
               )}
             />
 
-            {formState.error && (
+            {!!formState.error && (
               <div className="text-red-600 text-sm">
                 チーム情報の更新に失敗しました。入力内容を確認してください。
               </div>

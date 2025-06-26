@@ -33,7 +33,7 @@ import {
 
 const inviteTeamMemberSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
-  role: z.enum(["admin", "member", "viewer"]).default("member"),
+  role: z.enum(["admin", "member", "viewer"]),
 });
 
 type InviteTeamMemberInput = z.infer<typeof inviteTeamMemberSchema>;
@@ -50,10 +50,10 @@ export function InviteTeamMemberDialog({
   const [open, setOpen] = useState(false);
 
   const form = useForm<InviteTeamMemberInput>({
-    resolver: zodResolver(inviteTeamMemberSchema) as any,
+    resolver: zodResolver(inviteTeamMemberSchema),
     defaultValues: {
       email: "",
-      role: "member",
+      role: "member" as const,
     },
   });
 
@@ -136,7 +136,7 @@ export function InviteTeamMemberDialog({
               )}
             />
 
-            {formState.error && (
+            {!!formState.error && (
               <div className="text-red-600 text-sm">
                 招待の送信に失敗しました。入力内容を確認してください。
               </div>

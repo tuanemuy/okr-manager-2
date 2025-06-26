@@ -57,7 +57,7 @@ export function UpdateKeyResultDialog({
   const [open, setOpen] = useState(false);
 
   const form = useForm<UpdateKeyResultInput>({
-    resolver: zodResolver(updateKeyResultSchema) as any,
+    resolver: zodResolver(updateKeyResultSchema),
     defaultValues: {
       title: keyResult.title,
       description: keyResult.description || "",
@@ -212,7 +212,7 @@ export function UpdateKeyResultDialog({
               />
             </div>
 
-            {formState.error && (
+            {!!formState.error && (
               <div className="text-red-600 text-sm">
                 Key Resultの更新に失敗しました。入力内容を確認してください。
               </div>
