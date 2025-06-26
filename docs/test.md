@@ -6,4 +6,4 @@
 
 ## Application Service Tests
 
-- Use `src/core/application/${domain}/${usecase}.test.ts` for unit tests of application services
+- If needed, use `src/core/application/${domain}/${usecase}.test.ts` for unit tests of application services
