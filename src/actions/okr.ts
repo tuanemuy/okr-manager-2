@@ -1,14 +1,10 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { z } from "zod/v4";
 import { createKeyResult } from "@/core/application/okr/createKeyResult";
 import { createObjective } from "@/core/application/okr/createObjective";
 import { getObjective } from "@/core/application/okr/getObjective";
-import { getOKRDashboard } from "@/core/application/okr/getOKRDashboard";
-import { listObjectives } from "@/core/application/okr/listObjectives";
 import { updateKeyResult } from "@/core/application/okr/updateKeyResult";
-import { updateObjective } from "@/core/application/okr/updateObjective";
 import { requireAuth } from "@/lib/auth";
 import type { FormState } from "@/lib/formState";
 import { validate } from "@/lib/validation";
@@ -42,66 +38,6 @@ const updateKeyResultSchema = z.object({
   currentValue: z.number().optional(),
   unit: z.string().optional(),
 });
-
-export async function getDashboardData(userId: string, teamId?: string) {
-  const result = await getOKRDashboard(context, userId, teamId);
-
-  if (result.isErr()) {
-    throw new Error("Failed to fetch dashboard data");
-  }
-
-  // Transform to view type with computed properties
-  return {
-    ...result.value,
-    overallProgress: result.value.averageProgress,
-    teamCount: 0, // TODO: Add team count to dashboard service
-    quarterlyCompletion: 0, // TODO: Add quarterly completion calculation
-    recentObjectives: [], // TODO: Add recent objectives to dashboard service
-    teamActivity: [], // TODO: Add team activity to dashboard service
-  };
-}
-
-export async function getObjectivesData(filters?: {
-  type?: "personal" | "team" | "organization";
-  teamId?: string;
-}) {
-  const user = await requireAuth();
-
-  const result = await listObjectives(context, user.id, {
-    pagination: {
-      page: 1,
-      limit: 50,
-      order: "desc",
-      orderBy: "createdAt",
-    },
-    filter: filters ? {
-      type: filters.type,
-      teamId: filters.teamId,
-    } : undefined,
-  });
-
-  if (result.isErr()) {
-    throw new Error("Failed to fetch objectives");
-  }
-
-  // Transform to view type with computed properties
-  const transformedItems = result.value.items.map((objective) => ({
-    ...objective,
-    progress: objective.progressPercentage || 0,
-    keyResults: [],
-    keyResultsCount: 0,
-  }));
-
-  const page = 1; // Current page
-  const limit = 50; // Items per page
-  
-  return {
-    items: transformedItems,
-    count: result.value.count,
-    hasNext: (page * limit) < result.value.count,
-    hasPrev: page > 1,
-  };
-}
 
 export async function getObjectiveData(objectiveId: string) {
   const user = await requireAuth();

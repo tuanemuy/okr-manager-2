@@ -204,7 +204,9 @@ export async function inviteToTeamAction(
   if (roleResult.isErr() || !roleResult.value) {
     return {
       input: rawData,
-      error: roleResult.isErr() ? roleResult.error : new Error("Role not found"),
+      error: roleResult.isErr()
+        ? roleResult.error
+        : new Error("Role not found"),
     };
   }
 
@@ -258,7 +260,9 @@ export async function addTeamMemberAction(
   if (roleResult.isErr() || !roleResult.value) {
     return {
       input: rawData,
-      error: roleResult.isErr() ? roleResult.error : new Error("Role not found"),
+      error: roleResult.isErr()
+        ? roleResult.error
+        : new Error("Role not found"),
     };
   }
 
