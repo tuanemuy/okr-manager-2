@@ -11,7 +11,7 @@
 
 - テストの実装が設計に従っているか確認する
 - テストの品質をレビューする
-- `docs/${yyyyMMddHHmm}_review_test.md` を更新する
+- `logs/${yyyyMMddHHmm}_review_test.md` を更新する
 
 ## 備考
 

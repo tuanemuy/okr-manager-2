@@ -10,7 +10,7 @@
 
 - 実装が設計に従っているか確認する
 - コードの品質をレビューする
-- `docs/${yyyyMMddHHmm}_review_frontend.md` を更新する
+- `logs/${yyyyMMddHHmm}_review_frontend.md` を更新する
 
 ## 備考
 

@@ -8,7 +8,7 @@
 
 ## タスク
 
-- 設計と実装を比較して、`docs/${yyyyMMddHHmm}_progress_frontend.md` を更新する
+- 設計と実装を比較して、`logs/${yyyyMMddHHmm}_progress_frontend.md` を更新する
 
 ## 備考
 
