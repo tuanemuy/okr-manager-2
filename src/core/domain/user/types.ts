@@ -6,7 +6,7 @@ export const userSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   name: z.string().min(1).max(100),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: z.string().url().nullable().optional(),
   emailVerified: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -36,7 +36,7 @@ export type CreateUserParams = z.infer<typeof createUserParamsSchema>;
 // Update user input
 export const updateUserInputSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: z.string().url().nullable().optional(),
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserInputSchema>;
