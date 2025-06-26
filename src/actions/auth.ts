@@ -7,6 +7,8 @@ import { login } from "@/core/application/auth/login";
 import { logout } from "@/core/application/auth/logout";
 import { register } from "@/core/application/auth/register";
 import { requestPasswordReset } from "@/core/application/auth/requestPasswordReset";
+import { validateSession } from "@/core/application/auth/validateSession";
+import type { User } from "@/core/domain/user/types";
 import type { FormState } from "@/lib/formState";
 import { validate } from "@/lib/validation";
 import { context } from "./context";
@@ -53,7 +55,7 @@ export async function loginAction(
   }
 
   const cookieStore = await cookies();
-  cookieStore.set("sessionId", result.value.session.id, {
+  cookieStore.set("sessionToken", result.value.session.token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -99,11 +101,11 @@ export async function registerAction(
 
 export async function logoutAction(): Promise<void> {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get("sessionId")?.value;
+  const sessionToken = cookieStore.get("sessionToken")?.value;
 
-  if (sessionId) {
-    await logout(context, { token: sessionId });
-    cookieStore.delete("sessionId");
+  if (sessionToken) {
+    await logout(context, { token: sessionToken });
+    cookieStore.delete("sessionToken");
   }
 
   redirect("/login");
@@ -139,4 +141,31 @@ export async function requestPasswordResetAction(
     result: result.value,
     error: null,
   };
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("sessionToken")?.value;
+
+  if (!sessionToken) {
+    return null;
+  }
+
+  const result = await validateSession(context, { token: sessionToken });
+
+  if (result.isErr()) {
+    return null;
+  }
+
+  return result.value.user;
+}
+
+export async function requireAuth(): Promise<User> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  return user;
 }
