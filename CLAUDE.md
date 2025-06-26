@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Runtime**: Node.js 22.x
 - **Frontend**: Next.js 15 with React 19, Tailwind CSS, shadcn/ui and React Hook Form
 - **Database**: SQLite with Drizzle ORM
-- **Validation**: Zod 4 schemas
+- **Validation**: Zod 4 schemas（ `import { z } from "zod/v4";` is valid for zod@^3）
 - **Error Handling**: neverthrow for Result types
 
 ## Backend Architecture
@@ -68,4 +68,4 @@ See `docs/frontend.md` for detailed examples of server actions and client compon
 ## Error Handling
 
 - All backend functions return `Result<T, E>` or `Promise<Result<T, E>>` types using `neverthrow`
-- Each modules has its own error types, e.g. `RepositoryError`, `ApplicationError`. Error types should extend a base `AnyError` class (`src/lib/errors.ts`)
+- Each modules has its own error types, e.g. `RepositoryError`, `ApplicationError`. Error types should extend a base `AnyError` class (`src/lib/error.ts`)

@@ -5,7 +5,7 @@
 ```typescript
 // src/core/domain/post/types.ts
 
-import { z } from "zod/v4";
+import { z } from "zod/v4"; // "zod/v4" is valid for zod@^3
 import { paginationSchema } from "@/lib/pagination";
 
 export const postSchema = z.object({
@@ -142,7 +142,7 @@ export const posts = pgTable(
 ```typescript
 // src/core/application/post/createPost.ts
 
-import { z } from "zod/v4";
+import { z } from "zod/v4"; // "zod/v4" is valid for zod@^3
 import { Result } from "neverthrow";
 import type { PostRepository } from "@/domain/post/ports/postRepository";
 import type { Context } from "../context";
