@@ -334,8 +334,11 @@ export const objectivesRelations = relations(objectives, ({ one, many }) => ({
   parent: one(objectives, {
     fields: [objectives.parentId],
     references: [objectives.id],
+    relationName: "ObjectiveParent",
   }),
-  children: many(objectives),
+  children: many(objectives, {
+    relationName: "ObjectiveParent",
+  }),
   keyResults: many(keyResults),
 }));
 
