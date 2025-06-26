@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,8 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+
   useEffect(() => {
     console.error("Application error:", error);
   }, [error]);
@@ -53,9 +56,7 @@ export default function ErrorPage({
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => {
-                window.location.href = "/";
-              }}
+              onClick={() => router.push("/")}
             >
               ホームに戻る
             </Button>
