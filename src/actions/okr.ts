@@ -3,6 +3,7 @@
 import { z } from "zod/v4";
 import { createKeyResult } from "@/core/application/okr/createKeyResult";
 import { createObjective } from "@/core/application/okr/createObjective";
+import { deleteKeyResult } from "@/core/application/okr/deleteKeyResult";
 import { getObjective } from "@/core/application/okr/getObjective";
 import { updateKeyResult } from "@/core/application/okr/updateKeyResult";
 import { requireAuth } from "@/lib/auth";
@@ -201,4 +202,18 @@ export async function updateKeyResultAction(
     result: result.value,
     error: null,
   };
+}
+
+export async function deleteKeyResultAction(
+  keyResultId: string,
+): Promise<void> {
+  const user = await requireAuth();
+
+  const result = await deleteKeyResult(context, user.id, keyResultId);
+
+  if (result.isErr()) {
+    throw new Error("Failed to delete key result");
+  }
+
+  // Page will be refreshed by Next.js navigation
 }
