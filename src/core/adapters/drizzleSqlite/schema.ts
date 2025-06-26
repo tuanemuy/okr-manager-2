@@ -238,9 +238,16 @@ export const keyResults = sqliteTable("key_results", {
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   createdTeams: many(teams),
-  teamMembers: many(teamMembers),
+  teamMembers: many(teamMembers, {
+    relationName: "TeamMemberUser",
+  }),
+  invitedTeamMembers: many(teamMembers, {
+    relationName: "TeamMemberInvitedBy",
+  }),
   objectives: many(objectives),
-  sentInvitations: many(teamInvitations),
+  sentInvitations: many(teamInvitations, {
+    relationName: "TeamInvitationInvitedBy",
+  }),
   sessions: many(sessions),
 }));
 
@@ -293,6 +300,7 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
   user: one(users, {
     fields: [teamMembers.userId],
     references: [users.id],
+    relationName: "TeamMemberUser",
   }),
   role: one(roles, {
     fields: [teamMembers.roleId],
@@ -301,6 +309,7 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
   invitedBy: one(users, {
     fields: [teamMembers.invitedById],
     references: [users.id],
+    relationName: "TeamMemberInvitedBy",
   }),
 }));
 
@@ -318,6 +327,7 @@ export const teamInvitationsRelations = relations(
     invitedBy: one(users, {
       fields: [teamInvitations.invitedById],
       references: [users.id],
+      relationName: "TeamInvitationInvitedBy",
     }),
   }),
 );
@@ -334,8 +344,11 @@ export const objectivesRelations = relations(objectives, ({ one, many }) => ({
   parent: one(objectives, {
     fields: [objectives.parentId],
     references: [objectives.id],
+    relationName: "ObjectiveParent",
   }),
-  children: many(objectives),
+  children: many(objectives, {
+    relationName: "ObjectiveParent",
+  }),
   keyResults: many(keyResults),
 }));
 

@@ -8,8 +8,8 @@ import { MockSessionRepository } from "@/core/adapters/mock/sessionRepository";
 import { MockTeamRepository } from "@/core/adapters/mock/teamRepository";
 import { MockUserRepository } from "@/core/adapters/mock/userRepository";
 import type { UserWithAuth } from "@/core/domain/user/types";
-import type { Context } from "../context";
 import { ApplicationError } from "../auth/register";
+import type { Context } from "../context";
 import { type LoginInput, login } from "./login";
 
 describe("login", () => {
