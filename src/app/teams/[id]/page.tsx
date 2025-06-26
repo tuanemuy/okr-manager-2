@@ -40,7 +40,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
   const team = await getTeamData(id);
 
   const isAdmin =
-    team.members.find((m) => m.userId === user.id)?.role === "admin";
+    team.members.find((m) => m.userId === user.id)?.role?.name === "admin";
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -130,20 +130,34 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {team.recentActivity.map((activity, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-3 text-sm"
-                  >
-                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                    <span className="text-gray-600">
-                      {activity.description}
-                    </span>
-                    <span className="text-gray-400 ml-auto">
-                      {new Date(activity.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                ))}
+                {team.recentActivity.length === 0 ? (
+                  <p className="text-gray-500 text-sm text-center py-4">
+                    最近のアクティビティがありません
+                  </p>
+                ) : (
+                  team.recentActivity.map((activity, index) => {
+                    const activityItem = activity as {
+                      description: string;
+                      createdAt: string;
+                    };
+                    return (
+                      <div
+                        key={`activity-${index}-${Date.now()}`}
+                        className="flex items-center space-x-3 text-sm"
+                      >
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        <span className="text-gray-600">
+                          {activityItem.description}
+                        </span>
+                        <span className="text-gray-400 ml-auto">
+                          {new Date(
+                            activityItem.createdAt,
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </CardContent>
           </Card>
@@ -183,12 +197,14 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                     <div className="flex items-center space-x-2">
                       <Badge
                         variant={
-                          member.role === "admin" ? "default" : "secondary"
+                          member.role?.name === "admin"
+                            ? "default"
+                            : "secondary"
                         }
                       >
-                        {member.role === "admin"
+                        {member.role?.name === "admin"
                           ? "管理者"
-                          : member.role === "member"
+                          : member.role?.name === "member"
                             ? "メンバー"
                             : "閲覧者"}
                       </Badge>
@@ -237,14 +253,17 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">
-                        {okr.progress.toFixed(1)}%
+                        {okr.progressPercentage?.toFixed(1) ?? 0}%
                       </div>
-                      <Progress value={okr.progress} className="w-20 mt-1" />
+                      <Progress
+                        value={okr.progressPercentage ?? 0}
+                        className="w-20 mt-1"
+                      />
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>{okr.keyResultsCount} つのKey Result</span>
+                    <span>{okr.keyResults.length} つのKey Result</span>
                     <span>
                       {new Date(okr.startDate).toLocaleDateString()} -{" "}
                       {new Date(okr.endDate).toLocaleDateString()}

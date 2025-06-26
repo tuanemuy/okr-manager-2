@@ -40,7 +40,7 @@ export function CreateTeamDialog({ children }: CreateTeamDialogProps) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<CreateTeamInput>({
-    resolver: zodResolver(createTeamSchema) as any,
+    resolver: zodResolver(createTeamSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -115,7 +115,7 @@ export function CreateTeamDialog({ children }: CreateTeamDialogProps) {
               )}
             />
 
-            {formState.error && (
+            {!!formState.error && (
               <div className="text-red-600 text-sm">
                 チームの作成に失敗しました。入力内容を確認してください。
               </div>

@@ -1,29 +1,20 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { z } from "zod/v4";
-import {
-  type AddTeamMemberInput,
-  addTeamMember,
-} from "@/core/application/team/addTeamMember";
-import {
-  type CreateTeamInput,
-  createTeam,
-} from "@/core/application/team/createTeam";
+import { listObjectives } from "@/core/application/okr/listObjectives";
+import { addTeamMember } from "@/core/application/team/addTeamMember";
+import { createTeam } from "@/core/application/team/createTeam";
 import { getTeam } from "@/core/application/team/getTeam";
-import {
-  type InviteToTeamInput,
-  inviteToTeam,
-} from "@/core/application/team/inviteToTeam";
+import { inviteToTeam } from "@/core/application/team/inviteToTeam";
+import { listTeamMembers } from "@/core/application/team/listTeamMembers";
 import { listTeams } from "@/core/application/team/listTeams";
-import {
-  type RemoveTeamMemberInput,
-  removeTeamMember,
-} from "@/core/application/team/removeTeamMember";
-import {
-  type UpdateTeamInput,
-  updateTeam,
-} from "@/core/application/team/updateTeam";
+import { removeTeamMember } from "@/core/application/team/removeTeamMember";
+import { updateTeam } from "@/core/application/team/updateTeam";
+import { getUser } from "@/core/application/user/getUser";
+import type { ObjectiveWithKeyResults } from "@/core/domain/okr/types";
+import type { Role } from "@/core/domain/role/types";
+import type { Team, TeamMember } from "@/core/domain/team/types";
+import type { User } from "@/core/domain/user/types";
 import { requireAuth } from "@/lib/auth";
 import type { FormState } from "@/lib/formState";
 import { validate } from "@/lib/validation";
@@ -52,10 +43,12 @@ const addTeamMemberSchema = z.object({
   role: z.enum(["admin", "member", "viewer"]).default("member"),
 });
 
-const removeTeamMemberSchema = z.object({
-  teamId: z.string().uuid(),
-  userId: z.string().uuid(),
-});
+type TeamWithStatsAndRole = Team & {
+  memberCount: number;
+  activeOkrCount: number;
+  role: string;
+  okrCount: number;
+};
 
 export async function getTeamsData() {
   const user = await requireAuth();
@@ -69,11 +62,54 @@ export async function getTeamsData() {
     throw new Error("Failed to fetch teams");
   }
 
-  // Return the paginated result directly as it contains items array
-  return result.value;
+  // Get user's role in each team
+  const teamsWithRole = await Promise.all(
+    result.value.items.map(async (team) => {
+      const memberResult = await context.teamRepository.findMember(
+        team.id,
+        user.id,
+      );
+
+      if (memberResult.isErr() || !memberResult.value) {
+        throw new Error(`Failed to fetch member info for team ${team.id}`);
+      }
+
+      const roleResult = await context.roleRepository.findRoleById(
+        memberResult.value.roleId,
+      );
+
+      if (roleResult.isErr() || !roleResult.value) {
+        throw new Error(`Failed to fetch role ${memberResult.value.roleId}`);
+      }
+
+      return {
+        ...team,
+        role: roleResult.value.name,
+        okrCount: team.activeOkrCount, // Use activeOkrCount as okrCount
+      } as TeamWithStatsAndRole;
+    }),
+  );
+
+  return {
+    items: teamsWithRole,
+    count: result.value.count,
+  };
 }
 
-export async function getTeamData(teamId: string) {
+type TeamMemberWithUserAndRole = TeamMember & {
+  user: User;
+  role: Role | null;
+};
+
+type TeamDetailView = Team & {
+  members: TeamMemberWithUserAndRole[];
+  okrs: ObjectiveWithKeyResults[];
+  overallProgress: number;
+  activeOkrCount: number;
+  recentActivity: unknown[];
+};
+
+export async function getTeamData(teamId: string): Promise<TeamDetailView> {
   const user = await requireAuth();
 
   const result = await getTeam(context, { id: teamId, requesterId: user.id });
@@ -84,19 +120,84 @@ export async function getTeamData(teamId: string) {
 
   const team = result.value;
 
-  // Transform to view type with computed properties
+  // Fetch team members
+  const membersResult = await listTeamMembers(context, {
+    teamId,
+    requesterId: user.id,
+    page: 1,
+    limit: 100,
+  });
+
+  if (membersResult.isErr()) {
+    throw new Error("Failed to fetch team members");
+  }
+
+  // Enrich members with user and role data
+  const membersWithDetails = await Promise.all(
+    membersResult.value.items.map(async (member) => {
+      // Get user details
+      const userResult = await getUser(context, { id: member.userId });
+      if (userResult.isErr()) {
+        throw new Error(`Failed to fetch user ${member.userId}`);
+      }
+
+      // Get role details
+      const roleResult = await context.roleRepository.findRoleById(
+        member.roleId,
+      );
+      if (roleResult.isErr()) {
+        throw new Error(`Failed to fetch role ${member.roleId}`);
+      }
+
+      return {
+        ...member,
+        user: userResult.value,
+        role: roleResult.value,
+      };
+    }),
+  );
+
+  // Fetch team objectives
+  const objectivesResult = await listObjectives(
+    context,
+    user.id,
+    {
+      pagination: { page: 1, limit: 100, order: "desc", orderBy: "createdAt" },
+      filter: { teamId },
+    },
+    true, // include key results
+  );
+
+  if (objectivesResult.isErr()) {
+    throw new Error("Failed to fetch team objectives");
+  }
+
+  // Calculate overall progress
+  const overallProgress =
+    objectivesResult.value.items.length > 0
+      ? objectivesResult.value.items.reduce(
+          (sum, obj) => sum + (obj.progressPercentage ?? 0),
+          0,
+        ) / objectivesResult.value.items.length
+      : 0;
+
+  // Count active OKRs
+  const activeOkrCount = objectivesResult.value.items.filter(
+    (obj) => obj.status === "active",
+  ).length;
+
   return {
     ...team,
-    members: [], // TODO: Add team members fetching
-    okrs: [], // TODO: Add team objectives fetching
-    overallProgress: 0, // TODO: Calculate team overall progress
-    activeOkrCount: 0, // TODO: Calculate active OKR count
+    members: membersWithDetails,
+    okrs: objectivesResult.value.items,
+    overallProgress,
+    activeOkrCount,
     recentActivity: [], // TODO: Add recent activity
   };
 }
 
 export async function createTeamAction(
-  prevState: FormState,
+  _prevState: FormState,
   formData: FormData,
 ): Promise<FormState> {
   const user = await requireAuth();

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock, Save, User } from "lucide-react";
+import { Lock, Save, User as UserIcon } from "lucide-react";
 import { startTransition, useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
@@ -52,7 +52,7 @@ interface ProfileFormsProps {
 
 export function ProfileForms({ user }: ProfileFormsProps) {
   const profileForm = useForm<UpdateProfileInput>({
-    resolver: zodResolver(updateProfileSchema) as any,
+    resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: user.name,
       email: user.email,
@@ -60,7 +60,7 @@ export function ProfileForms({ user }: ProfileFormsProps) {
   });
 
   const passwordForm = useForm<ChangePasswordInput>({
-    resolver: zodResolver(changePasswordSchema) as any,
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
@@ -114,7 +114,7 @@ export function ProfileForms({ user }: ProfileFormsProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <User className="h-5 w-5" />
+              <UserIcon className="h-5 w-5" />
               <span>基本情報</span>
             </CardTitle>
           </CardHeader>
@@ -156,13 +156,13 @@ export function ProfileForms({ user }: ProfileFormsProps) {
                   )}
                 />
 
-                {profileState.error && (
+                {!!profileState.error && (
                   <div className="text-red-600 text-sm">
                     プロフィールの更新に失敗しました。入力内容を確認してください。
                   </div>
                 )}
 
-                {profileState.result && (
+                {!!profileState.result && (
                   <div className="text-green-600 text-sm">
                     プロフィールを更新しました。
                   </div>
@@ -250,13 +250,13 @@ export function ProfileForms({ user }: ProfileFormsProps) {
                   )}
                 />
 
-                {passwordState.error && (
+                {!!passwordState.error && (
                   <div className="text-red-600 text-sm">
                     パスワードの変更に失敗しました。入力内容を確認してください。
                   </div>
                 )}
 
-                {passwordState.result && (
+                {!!passwordState.result && (
                   <div className="text-green-600 text-sm">
                     パスワードを変更しました。
                   </div>

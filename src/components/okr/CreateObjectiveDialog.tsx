@@ -53,7 +53,7 @@ export function CreateObjectiveDialog({
   const [open, setOpen] = useState(false);
 
   const form = useForm<CreateObjectiveInput>({
-    resolver: zodResolver(createObjectiveSchema) as any,
+    resolver: zodResolver(createObjectiveSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -207,7 +207,7 @@ export function CreateObjectiveDialog({
               />
             </div>
 
-            {formState.error && (
+            {!!formState.error && (
               <div className="text-red-600 text-sm">
                 OKRの作成に失敗しました。入力内容を確認してください。
               </div>

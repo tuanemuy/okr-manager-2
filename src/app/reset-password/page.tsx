@@ -32,7 +32,7 @@ type ResetInput = z.infer<typeof resetSchema>;
 
 export default function ResetPasswordPage() {
   const form = useForm<ResetInput>({
-    resolver: zodResolver(resetSchema) as any,
+    resolver: zodResolver(resetSchema),
     defaultValues: {
       email: "",
     },
@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
                 )}
               />
 
-              {formState.error && (
+              {!!formState.error && (
                 <div className="text-red-600 text-sm">
                   メール送信に失敗しました。メールアドレスを確認してください。
                 </div>

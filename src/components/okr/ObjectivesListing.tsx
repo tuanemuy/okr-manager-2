@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ObjectiveWithKeyResults } from "@/core/domain/okr/types";
 import { listObjectives } from "@/core/application/okr/listObjectives";
+import type { ObjectiveWithKeyResults } from "@/core/domain/okr/types";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function ObjectivesListing() {
@@ -79,7 +79,11 @@ export async function ObjectivesListing() {
   );
 }
 
-function ObjectivesList({ objectives }: { objectives: ObjectiveWithKeyResults[] }) {
+function ObjectivesList({
+  objectives,
+}: {
+  objectives: ObjectiveWithKeyResults[];
+}) {
   if (objectives.length === 0) {
     return (
       <Card>

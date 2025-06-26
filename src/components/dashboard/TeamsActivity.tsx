@@ -2,10 +2,8 @@ import { Users } from "lucide-react";
 import Link from "next/link";
 import { context } from "@/actions/context";
 import { CreateTeamDialog } from "@/components/team/CreateTeamDialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { listTeams } from "@/core/application/team/listTeams";
 
 interface TeamsActivityProps {
