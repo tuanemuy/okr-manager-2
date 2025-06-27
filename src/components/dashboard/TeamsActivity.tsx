@@ -77,7 +77,7 @@ export async function TeamsActivity({ userId }: TeamsActivityProps) {
         </CardContent>
       </Card>
     );
-  } catch (error) {
+  } catch (_error) {
     return (
       <Card>
         <CardHeader>

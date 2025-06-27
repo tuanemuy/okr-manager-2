@@ -100,7 +100,7 @@ export async function RecentObjectives() {
         </CardContent>
       </Card>
     );
-  } catch (error) {
+  } catch (_error) {
     return (
       <Card>
         <CardHeader>

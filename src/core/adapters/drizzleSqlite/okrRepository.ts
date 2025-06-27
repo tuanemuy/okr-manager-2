@@ -788,29 +788,24 @@ export class DrizzleSqliteOkrRepository implements OkrRepository {
         .innerJoin(objectives, eq(keyResults.objectiveId, objectives.id))
         .where(whereClause);
 
-      // Calculate risk status
+      // Calculate risk status - directly calculate progress conditions without subquery
+      const progressCondition = sql`CASE WHEN ${keyResults.type} = 'boolean' THEN 
+                                         CASE WHEN ${keyResults.currentValue} = ${keyResults.targetValue} THEN 100 ELSE 0 END
+                                     WHEN ${keyResults.type} = 'percentage' THEN ${keyResults.currentValue}
+                                     ELSE (${keyResults.currentValue} / ${keyResults.targetValue}) * 100 
+                                     END`;
+
       const riskStats = await this.db
         .select({
-          onTrack: count(sql`CASE WHEN progress >= 70 THEN 1 END`),
+          onTrack: count(sql`CASE WHEN (${progressCondition}) >= 70 THEN 1 END`),
           atRisk: count(
-            sql`CASE WHEN progress >= 30 AND progress < 70 THEN 1 END`,
+            sql`CASE WHEN (${progressCondition}) >= 30 AND (${progressCondition}) < 70 THEN 1 END`,
           ),
-          behind: count(sql`CASE WHEN progress < 30 THEN 1 END`),
+          behind: count(sql`CASE WHEN (${progressCondition}) < 30 THEN 1 END`),
         })
-        .from(
-          this.db
-            .select({
-              progress: sql`CASE WHEN ${keyResults.type} = 'boolean' THEN 
-                                 CASE WHEN ${keyResults.currentValue} = ${keyResults.targetValue} THEN 100 ELSE 0 END
-                             WHEN ${keyResults.type} = 'percentage' THEN ${keyResults.currentValue}
-                             ELSE (${keyResults.currentValue} / ${keyResults.targetValue}) * 100 
-                             END`,
-            })
-            .from(keyResults)
-            .innerJoin(objectives, eq(keyResults.objectiveId, objectives.id))
-            .where(whereClause)
-            .as("kr_progress"),
-        );
+        .from(keyResults)
+        .innerJoin(objectives, eq(keyResults.objectiveId, objectives.id))
+        .where(whereClause);
 
       const stats = {
         totalObjectives: objectiveStats[0]?.total ?? 0,

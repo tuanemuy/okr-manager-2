@@ -16,7 +16,7 @@ interface OKRsPageProps {
   user: User;
 }
 
-export function OKRsPageClient({ user }: OKRsPageProps) {
+export function OKRsPageClient({ user: _user }: OKRsPageProps) {
   const [filters, setFilters] = useState<OKRFilters>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -52,7 +52,7 @@ export function OKRsPageClient({ user }: OKRsPageProps) {
         </div>
       </div>
 
-      <FilterableObjectivesListing filters={filters} user={user} />
+      <FilterableObjectivesListing filters={filters} />
     </div>
   );
 }
