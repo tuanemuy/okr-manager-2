@@ -11,17 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ObjectiveWithKeyResults } from "@/core/domain/okr/types";
-import type { User } from "@/core/domain/user/types";
 import type { OKRFilters } from "./OKRFilterDialog";
 
 interface FilterableObjectivesListingProps {
   filters: OKRFilters;
-  user: User;
 }
 
 export function FilterableObjectivesListing({
   filters,
-  user,
 }: FilterableObjectivesListingProps) {
   const [objectives, setObjectives] = useState<{
     all: ObjectiveWithKeyResults[];

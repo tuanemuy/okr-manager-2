@@ -791,11 +791,11 @@ export class DrizzleSqliteOkrRepository implements OkrRepository {
       // Calculate risk status
       const riskStats = await this.db
         .select({
-          onTrack: count(sql`CASE WHEN progress >= 70 THEN 1 END`),
+          onTrack: count(sql`CASE WHEN kr_progress.progress >= 70 THEN 1 END`),
           atRisk: count(
-            sql`CASE WHEN progress >= 30 AND progress < 70 THEN 1 END`,
+            sql`CASE WHEN kr_progress.progress >= 30 AND kr_progress.progress < 70 THEN 1 END`,
           ),
-          behind: count(sql`CASE WHEN progress < 30 THEN 1 END`),
+          behind: count(sql`CASE WHEN kr_progress.progress < 30 THEN 1 END`),
         })
         .from(
           this.db
