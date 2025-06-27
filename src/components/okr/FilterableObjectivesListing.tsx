@@ -3,14 +3,13 @@
 import { Plus, Target } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { context } from "@/actions/context";
+import { listObjectivesAction } from "@/actions/okr";
 import { CreateObjectiveDialog } from "@/components/okr/CreateObjectiveDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { listObjectives } from "@/core/application/okr/listObjectives";
 import type { ObjectiveWithKeyResults } from "@/core/domain/okr/types";
 import type { User } from "@/core/domain/user/types";
 import type { OKRFilters } from "./OKRFilterDialog";
@@ -63,7 +62,7 @@ export function FilterableObjectivesListing({
         }
 
         // Fetch all objectives with filters
-        const allResult = await listObjectives(context, user.id, {
+        const allResult = await listObjectivesAction({
           pagination: {
             page: 1,
             limit: 100,
@@ -74,7 +73,7 @@ export function FilterableObjectivesListing({
         });
 
         // Fetch filtered by type
-        const personalResult = await listObjectives(context, user.id, {
+        const personalResult = await listObjectivesAction({
           pagination: {
             page: 1,
             limit: 100,
@@ -84,7 +83,7 @@ export function FilterableObjectivesListing({
           filter: { ...baseFilter, type: "personal" },
         });
 
-        const teamResult = await listObjectives(context, user.id, {
+        const teamResult = await listObjectivesAction({
           pagination: {
             page: 1,
             limit: 100,
@@ -94,7 +93,7 @@ export function FilterableObjectivesListing({
           filter: { ...baseFilter, type: "team" },
         });
 
-        const organizationResult = await listObjectives(context, user.id, {
+        const organizationResult = await listObjectivesAction({
           pagination: {
             page: 1,
             limit: 100,
@@ -104,14 +103,10 @@ export function FilterableObjectivesListing({
           filter: { ...baseFilter, type: "organization" },
         });
 
-        const allObjectives = allResult.isOk() ? allResult.value.items : [];
-        const personalObjectives = personalResult.isOk()
-          ? personalResult.value.items
-          : [];
-        const teamObjectives = teamResult.isOk() ? teamResult.value.items : [];
-        const organizationObjectives = organizationResult.isOk()
-          ? organizationResult.value.items
-          : [];
+        const allObjectives = allResult.items;
+        const personalObjectives = personalResult.items;
+        const teamObjectives = teamResult.items;
+        const organizationObjectives = organizationResult.items;
 
         // Apply client-side filtering for progress and type
         const applyClientFilters = (objs: ObjectiveWithKeyResults[]) => {
@@ -151,7 +146,7 @@ export function FilterableObjectivesListing({
     };
 
     fetchObjectives();
-  }, [filters, user.id]);
+  }, [filters]);
 
   if (loading) {
     return (

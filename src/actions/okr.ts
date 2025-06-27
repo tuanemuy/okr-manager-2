@@ -5,6 +5,7 @@ import { createKeyResult } from "@/core/application/okr/createKeyResult";
 import { createObjective } from "@/core/application/okr/createObjective";
 import { deleteKeyResult } from "@/core/application/okr/deleteKeyResult";
 import { getObjective } from "@/core/application/okr/getObjective";
+import { listObjectives } from "@/core/application/okr/listObjectives";
 import { updateKeyResult } from "@/core/application/okr/updateKeyResult";
 import { requireAuth } from "@/lib/auth";
 import type { FormState } from "@/lib/formState";
@@ -216,4 +217,43 @@ export async function deleteKeyResultAction(
   }
 
   // Page will be refreshed by Next.js navigation
+}
+
+export async function listObjectivesAction(options?: {
+  pagination?: {
+    page: number;
+    limit: number;
+    order: "asc" | "desc";
+    orderBy: "createdAt" | "updatedAt";
+  };
+  filter?: {
+    status?: "draft" | "active" | "completed" | "cancelled";
+    startDate?: Date;
+    endDate?: Date;
+    type?: "personal" | "team" | "organization";
+  };
+}) {
+  const user = await requireAuth();
+
+  const defaultOptions = {
+    pagination: {
+      page: 1,
+      limit: 100,
+      order: "desc" as const,
+      orderBy: "createdAt",
+    },
+    filter: options?.filter,
+  };
+
+  const result = await listObjectives(
+    context,
+    user.id,
+    options ? { ...defaultOptions, ...options } : defaultOptions,
+  );
+
+  if (result.isErr()) {
+    throw new Error("Failed to fetch objectives");
+  }
+
+  return result.value;
 }
