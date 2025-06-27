@@ -5,6 +5,7 @@ import { createKeyResult } from "@/core/application/okr/createKeyResult";
 import { createObjective } from "@/core/application/okr/createObjective";
 import { deleteKeyResult } from "@/core/application/okr/deleteKeyResult";
 import { getObjective } from "@/core/application/okr/getObjective";
+import { getOKRDashboard } from "@/core/application/okr/getOKRDashboard";
 import { listObjectives } from "@/core/application/okr/listObjectives";
 import { updateKeyResult } from "@/core/application/okr/updateKeyResult";
 import { requireAuth } from "@/lib/auth";
@@ -253,6 +254,18 @@ export async function listObjectivesAction(options?: {
 
   if (result.isErr()) {
     throw new Error("Failed to fetch objectives");
+  }
+
+  return result.value;
+}
+
+export async function getOKRDashboardAction() {
+  const user = await requireAuth();
+
+  const result = await getOKRDashboard(context, user.id);
+
+  if (result.isErr()) {
+    throw new Error("Failed to fetch OKR dashboard");
   }
 
   return result.value;
