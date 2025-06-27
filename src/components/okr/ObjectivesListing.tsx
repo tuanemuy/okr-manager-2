@@ -1,13 +1,12 @@
 import { Plus, Target } from "lucide-react";
 import Link from "next/link";
-import { context } from "@/actions/context";
+import { listObjectivesAction } from "@/actions/okr";
 import { CreateObjectiveDialog } from "@/components/okr/CreateObjectiveDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { listObjectives } from "@/core/application/okr/listObjectives";
 import type { ObjectiveWithKeyResults } from "@/core/domain/okr/types";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -15,68 +14,82 @@ export async function ObjectivesListing() {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  // Fetch all objectives
-  const allResult = await listObjectives(context, user.id, {
-    pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
-  });
+  try {
+    // Fetch all objectives
+    const allResult = await listObjectivesAction({
+      pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
+    });
 
-  // Fetch personal objectives
-  const personalResult = await listObjectives(context, user.id, {
-    pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
-    filter: { type: "personal" },
-  });
+    // Fetch personal objectives
+    const personalResult = await listObjectivesAction({
+      pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
+      filter: { type: "personal" },
+    });
 
-  // Fetch team objectives
-  const teamResult = await listObjectives(context, user.id, {
-    pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
-    filter: { type: "team" },
-  });
+    // Fetch team objectives
+    const teamResult = await listObjectivesAction({
+      pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
+      filter: { type: "team" },
+    });
 
-  // Fetch organization objectives
-  const organizationResult = await listObjectives(context, user.id, {
-    pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
-    filter: { type: "organization" },
-  });
+    // Fetch organization objectives
+    const organizationResult = await listObjectivesAction({
+      pagination: { page: 1, limit: 50, order: "desc", orderBy: "createdAt" },
+      filter: { type: "organization" },
+    });
 
-  const allObjectives = allResult.isOk() ? allResult.value.items : [];
-  const personalObjectives = personalResult.isOk()
-    ? personalResult.value.items
-    : [];
-  const teamObjectives = teamResult.isOk() ? teamResult.value.items : [];
-  const organizationObjectives = organizationResult.isOk()
-    ? organizationResult.value.items
-    : [];
+    const allObjectives = allResult.items;
+    const personalObjectives = personalResult.items;
+    const teamObjectives = teamResult.items;
+    const organizationObjectives = organizationResult.items;
 
-  return (
-    <Tabs defaultValue="all" className="space-y-6">
-      <TabsList>
-        <TabsTrigger value="all">すべて ({allObjectives.length})</TabsTrigger>
-        <TabsTrigger value="personal">
-          個人 ({personalObjectives.length})
-        </TabsTrigger>
-        <TabsTrigger value="team">チーム ({teamObjectives.length})</TabsTrigger>
-        <TabsTrigger value="organization">
-          組織 ({organizationObjectives.length})
-        </TabsTrigger>
-      </TabsList>
+    return (
+      <Tabs defaultValue="all" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="all">すべて ({allObjectives.length})</TabsTrigger>
+          <TabsTrigger value="personal">
+            個人 ({personalObjectives.length})
+          </TabsTrigger>
+          <TabsTrigger value="team">
+            チーム ({teamObjectives.length})
+          </TabsTrigger>
+          <TabsTrigger value="organization">
+            組織 ({organizationObjectives.length})
+          </TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="all" className="space-y-4">
-        <ObjectivesList objectives={allObjectives} />
-      </TabsContent>
+        <TabsContent value="all" className="space-y-4">
+          <ObjectivesList objectives={allObjectives} />
+        </TabsContent>
 
-      <TabsContent value="personal" className="space-y-4">
-        <ObjectivesList objectives={personalObjectives} />
-      </TabsContent>
+        <TabsContent value="personal" className="space-y-4">
+          <ObjectivesList objectives={personalObjectives} />
+        </TabsContent>
 
-      <TabsContent value="team" className="space-y-4">
-        <ObjectivesList objectives={teamObjectives} />
-      </TabsContent>
+        <TabsContent value="team" className="space-y-4">
+          <ObjectivesList objectives={teamObjectives} />
+        </TabsContent>
 
-      <TabsContent value="organization" className="space-y-4">
-        <ObjectivesList objectives={organizationObjectives} />
-      </TabsContent>
-    </Tabs>
-  );
+        <TabsContent value="organization" className="space-y-4">
+          <ObjectivesList objectives={organizationObjectives} />
+        </TabsContent>
+      </Tabs>
+    );
+  } catch (error) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <Target className="h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            OKRを読み込めませんでした
+          </h3>
+          <p className="text-gray-600 text-center">
+            ページを再読み込みしてください。
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 }
 
 function ObjectivesList({

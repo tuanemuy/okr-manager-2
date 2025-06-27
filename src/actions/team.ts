@@ -408,3 +408,39 @@ export async function removeTeamMemberAction(
 
   // Page will be refreshed by Next.js navigation
 }
+
+export async function listTeamsAction(options?: {
+  pagination?: {
+    page: number;
+    limit: number;
+    order: "asc" | "desc";
+    orderBy: "createdAt" | "updatedAt";
+  };
+  filter?: {
+    search?: string;
+    memberId?: string;
+  };
+}) {
+  await requireAuth();
+
+  const defaultOptions = {
+    pagination: {
+      page: 1,
+      limit: 100,
+      order: "desc" as const,
+      orderBy: "createdAt",
+    },
+    filter: options?.filter,
+  };
+
+  const result = await listTeams(
+    context,
+    options ? { ...defaultOptions, ...options } : defaultOptions,
+  );
+
+  if (result.isErr()) {
+    throw new Error("Failed to fetch teams");
+  }
+
+  return result.value;
+}

@@ -1,9 +1,8 @@
 import { Target, TrendingUp, Users } from "lucide-react";
-import { context } from "@/actions/context";
+import { getOKRDashboardAction } from "@/actions/okr";
+import { listTeamsAction } from "@/actions/team";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getOKRDashboard } from "@/core/application/okr/getOKRDashboard";
-import { listTeams } from "@/core/application/team/listTeams";
 
 interface DashboardStatsProps {
   userId: string;
@@ -11,15 +10,14 @@ interface DashboardStatsProps {
 
 export async function DashboardStats({ userId }: DashboardStatsProps) {
   // Fetch OKR dashboard stats
-  const dashboardResult = await getOKRDashboard(context, userId);
-  const dashboard = dashboardResult.isOk() ? dashboardResult.value : null;
+  const dashboard = await getOKRDashboardAction();
 
   // Fetch user's teams count
-  const teamsResult = await listTeams(context, {
+  const teamsResult = await listTeamsAction({
     pagination: { page: 1, limit: 100, order: "desc", orderBy: "createdAt" },
     filter: { memberId: userId },
   });
-  const teamCount = teamsResult.isOk() ? teamsResult.value.count : 0;
+  const teamCount = teamsResult.count;
 
   if (!dashboard) {
     return (
