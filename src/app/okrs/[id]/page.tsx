@@ -24,6 +24,10 @@ export default async function OKRDetailPage({ params }: OKRDetailPageProps) {
   const { id } = await params;
   const objective = await getObjectiveData(id);
 
+  if (!objective) {
+    redirect("/okrs");
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-start mb-8">

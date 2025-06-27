@@ -18,6 +18,9 @@ export async function removeTeamMember(
   // Check if team exists
   const teamResult = await context.teamRepository.findById(input.teamId);
   if (teamResult.isErr()) {
+    await context.logger.error("Failed to find team", teamResult.error, {
+      teamId: input.teamId,
+    });
     return err(new ApplicationError("Failed to find team", teamResult.error));
   }
 
@@ -38,6 +41,11 @@ export async function removeTeamMember(
     input.userId,
   );
   if (memberResult.isErr()) {
+    await context.logger.error(
+      "Failed to find team member",
+      memberResult.error,
+      { teamId: input.teamId, userId: input.userId },
+    );
     return err(
       new ApplicationError("Failed to find team member", memberResult.error),
     );
@@ -65,6 +73,11 @@ export async function removeTeamMember(
   const member = memberResult.value;
   const removeResult = await context.teamRepository.removeMember(member.id);
   if (removeResult.isErr()) {
+    await context.logger.error(
+      "Failed to remove team member",
+      removeResult.error,
+      { teamId: input.teamId, userId: input.userId, memberId: member.id },
+    );
     return err(
       new ApplicationError("Failed to remove team member", removeResult.error),
     );

@@ -23,6 +23,11 @@ export async function listTeamMembers(
     input.requesterId,
   );
   if (isMemberResult.isErr()) {
+    await context.logger.error(
+      "Failed to check team membership",
+      isMemberResult.error,
+      { teamId: input.teamId, requesterId: input.requesterId },
+    );
     return err(
       new ApplicationError(
         "Failed to check team membership",
@@ -46,6 +51,11 @@ export async function listTeamMembers(
   });
 
   if (membersResult.isErr()) {
+    await context.logger.error(
+      "Failed to fetch team members",
+      membersResult.error,
+      { teamId: input.teamId, requesterId: input.requesterId },
+    );
     return err(
       new ApplicationError("Failed to fetch team members", membersResult.error),
     );

@@ -17,6 +17,9 @@ export async function getUser(
   const userResult = await context.userRepository.findById(input.id);
 
   if (userResult.isErr()) {
+    await context.logger.error("Failed to get user", userResult.error, {
+      userId: input.id,
+    });
     return err(new ApplicationError("Failed to get user", userResult.error));
   }
 

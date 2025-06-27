@@ -39,6 +39,10 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
   const { id } = await params;
   const team = await getTeamData(id);
 
+  if (!team) {
+    redirect("/teams");
+  }
+
   const isAdmin =
     team.members.find((m) => m.userId === user.id)?.role?.name === "admin";
 

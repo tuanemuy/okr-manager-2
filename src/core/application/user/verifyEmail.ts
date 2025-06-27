@@ -19,6 +19,11 @@ export async function verifyEmail(
     input.token,
   );
   if (userResult.isErr()) {
+    await context.logger.error(
+      "Failed to find user by token",
+      userResult.error,
+      { token: input.token },
+    );
     return err(
       new ApplicationError("Failed to find user by token", userResult.error),
     );
@@ -36,6 +41,11 @@ export async function verifyEmail(
     true,
   );
   if (setVerifiedResult.isErr()) {
+    await context.logger.error(
+      "Failed to verify email",
+      setVerifiedResult.error,
+      { userId: user.id },
+    );
     return err(
       new ApplicationError("Failed to verify email", setVerifiedResult.error),
     );
@@ -44,6 +54,11 @@ export async function verifyEmail(
   const clearTokenResult =
     await context.userRepository.setEmailVerificationToken(user.id, null);
   if (clearTokenResult.isErr()) {
+    await context.logger.error(
+      "Failed to clear verification token",
+      clearTokenResult.error,
+      { userId: user.id },
+    );
     return err(
       new ApplicationError(
         "Failed to clear verification token",
@@ -55,6 +70,11 @@ export async function verifyEmail(
   // Return updated user
   const updatedUserResult = await context.userRepository.findById(user.id);
   if (updatedUserResult.isErr()) {
+    await context.logger.error(
+      "Failed to get updated user",
+      updatedUserResult.error,
+      { userId: user.id },
+    );
     return err(
       new ApplicationError(
         "Failed to get updated user",

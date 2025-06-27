@@ -24,6 +24,11 @@ export async function createObjective(
       userId,
     );
     if (isMemberResult.isErr()) {
+      await context.logger.error(
+        "Failed to check team membership",
+        isMemberResult.error,
+        { teamId: input.teamId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check team membership",
@@ -41,6 +46,11 @@ export async function createObjective(
     const permissionsResult =
       await context.roleRepository.getUserPermissions(userId);
     if (permissionsResult.isErr()) {
+      await context.logger.error(
+        "Failed to check permissions",
+        permissionsResult.error,
+        { userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check permissions",
@@ -66,6 +76,11 @@ export async function createObjective(
       input.parentId,
     );
     if (parentResult.isErr()) {
+      await context.logger.error(
+        "Failed to find parent objective",
+        parentResult.error,
+        { parentId: input.parentId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to find parent objective",
@@ -82,6 +97,11 @@ export async function createObjective(
       userId,
     );
     if (canAccessResult.isErr()) {
+      await context.logger.error(
+        "Failed to check access to parent objective",
+        canAccessResult.error,
+        { parentId: input.parentId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check access to parent objective",
@@ -101,6 +121,11 @@ export async function createObjective(
   });
 
   if (createResult.isErr()) {
+    await context.logger.error(
+      "Failed to create objective",
+      createResult.error,
+      { userId, title: input.title, type: input.type, teamId: input.teamId },
+    );
     return err(
       new ApplicationError("Failed to create objective", createResult.error),
     );

@@ -20,6 +20,9 @@ export async function addTeamMember(
   // Check if team exists
   const teamResult = await context.teamRepository.findById(input.teamId);
   if (teamResult.isErr()) {
+    await context.logger.error("Failed to find team", teamResult.error, {
+      teamId: input.teamId,
+    });
     return err(new ApplicationError("Failed to find team", teamResult.error));
   }
 
@@ -36,6 +39,11 @@ export async function addTeamMember(
       input.requesterId,
     );
     if (requesterMemberResult.isErr()) {
+      await context.logger.error(
+        "Failed to check requester membership",
+        requesterMemberResult.error,
+        { teamId: input.teamId, requesterId: input.requesterId },
+      );
       return err(
         new ApplicationError(
           "Failed to check requester membership",
@@ -56,6 +64,9 @@ export async function addTeamMember(
   // Check if user to be added exists
   const userResult = await context.userRepository.findById(input.userId);
   if (userResult.isErr()) {
+    await context.logger.error("Failed to find user", userResult.error, {
+      userId: input.userId,
+    });
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 
@@ -69,6 +80,11 @@ export async function addTeamMember(
     input.userId,
   );
   if (existingMemberResult.isErr()) {
+    await context.logger.error(
+      "Failed to check existing membership",
+      existingMemberResult.error,
+      { teamId: input.teamId, userId: input.userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check existing membership",
@@ -90,6 +106,11 @@ export async function addTeamMember(
   });
 
   if (addResult.isErr()) {
+    await context.logger.error("Failed to add team member", addResult.error, {
+      teamId: input.teamId,
+      userId: input.userId,
+      roleId: input.roleId,
+    });
     return err(
       new ApplicationError("Failed to add team member", addResult.error),
     );

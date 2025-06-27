@@ -18,6 +18,9 @@ export async function changePassword(
   // Find user with auth info to verify current password
   const userResult = await context.userRepository.findById(input.userId);
   if (userResult.isErr()) {
+    await context.logger.error("Failed to find user", userResult.error, {
+      userId: input.userId,
+    });
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 
@@ -30,6 +33,11 @@ export async function changePassword(
     userResult.value.email,
   );
   if (userWithAuthResult.isErr()) {
+    await context.logger.error(
+      "Failed to get user auth info",
+      userWithAuthResult.error,
+      { userId: input.userId, email: userResult.value.email },
+    );
     return err(
       new ApplicationError(
         "Failed to get user auth info",
@@ -50,6 +58,11 @@ export async function changePassword(
     userWithAuth.hashedPassword,
   );
   if (verifyResult.isErr()) {
+    await context.logger.error(
+      "Failed to verify current password",
+      verifyResult.error,
+      { userId: input.userId },
+    );
     return err(
       new ApplicationError(
         "Failed to verify current password",
@@ -65,6 +78,11 @@ export async function changePassword(
   // Hash new password
   const hashResult = await context.passwordHasher.hash(input.newPassword);
   if (hashResult.isErr()) {
+    await context.logger.error(
+      "Failed to hash new password",
+      hashResult.error,
+      { userId: input.userId },
+    );
     return err(
       new ApplicationError("Failed to hash new password", hashResult.error),
     );
@@ -76,6 +94,11 @@ export async function changePassword(
     hashResult.value,
   );
   if (updateResult.isErr()) {
+    await context.logger.error(
+      "Failed to change password",
+      updateResult.error,
+      { userId: input.userId },
+    );
     return err(
       new ApplicationError("Failed to change password", updateResult.error),
     );

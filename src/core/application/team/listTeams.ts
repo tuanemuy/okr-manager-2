@@ -27,6 +27,10 @@ export async function listTeams(
   const listResult = await context.teamRepository.list(input);
 
   if (listResult.isErr()) {
+    await context.logger.error("Failed to list teams", listResult.error, {
+      filter: input.filter,
+      pagination: input.pagination,
+    });
     return err(new ApplicationError("Failed to list teams", listResult.error));
   }
 

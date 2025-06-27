@@ -16,6 +16,9 @@ export async function deleteUser(
   // Check if user exists
   const userResult = await context.userRepository.findById(input.id);
   if (userResult.isErr()) {
+    await context.logger.error("Failed to find user", userResult.error, {
+      userId: input.id,
+    });
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 
@@ -28,6 +31,11 @@ export async function deleteUser(
     input.id,
   );
   if (deleteSessionsResult.isErr()) {
+    await context.logger.error(
+      "Failed to delete user sessions",
+      deleteSessionsResult.error,
+      { userId: input.id },
+    );
     return err(
       new ApplicationError(
         "Failed to delete user sessions",
@@ -39,6 +47,9 @@ export async function deleteUser(
   // Delete user
   const deleteResult = await context.userRepository.delete(input.id);
   if (deleteResult.isErr()) {
+    await context.logger.error("Failed to delete user", deleteResult.error, {
+      userId: input.id,
+    });
     return err(
       new ApplicationError("Failed to delete user", deleteResult.error),
     );

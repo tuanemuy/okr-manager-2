@@ -18,6 +18,9 @@ export async function requestPasswordReset(
   // Find user by email
   const userResult = await context.userRepository.findByEmail(input.email);
   if (userResult.isErr()) {
+    await context.logger.error("Failed to find user", userResult.error, {
+      email: input.email,
+    });
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 
@@ -39,6 +42,11 @@ export async function requestPasswordReset(
   });
 
   if (emailResult.isErr()) {
+    await context.logger.error(
+      "Failed to send password reset email",
+      emailResult.error,
+      { email: input.email, userId: user.id },
+    );
     return err(
       new ApplicationError(
         "Failed to send password reset email",

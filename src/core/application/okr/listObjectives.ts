@@ -50,6 +50,11 @@ export async function listObjectives(
         filter: accessControlFilter,
       });
     if (objectivesResult.isErr()) {
+      await context.logger.error(
+        "Failed to list objectives with key results",
+        objectivesResult.error,
+        { query },
+      );
       return err(
         new ApplicationError(
           "Failed to list objectives with key results",
@@ -66,6 +71,11 @@ export async function listObjectives(
     });
 
     if (objectivesResult.isErr()) {
+      await context.logger.error(
+        "Failed to list objectives",
+        objectivesResult.error,
+        { query },
+      );
       return err(
         new ApplicationError(
           "Failed to list objectives",

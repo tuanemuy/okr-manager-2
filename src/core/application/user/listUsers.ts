@@ -24,6 +24,10 @@ export async function listUsers(
   const listResult = await context.userRepository.list(input);
 
   if (listResult.isErr()) {
+    await context.logger.error("Failed to list users", listResult.error, {
+      filter: input.filter,
+      pagination: input.pagination,
+    });
     return err(new ApplicationError("Failed to list users", listResult.error));
   }
 

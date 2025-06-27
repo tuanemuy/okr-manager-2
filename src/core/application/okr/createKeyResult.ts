@@ -17,6 +17,11 @@ export async function createKeyResult(
     input.objectiveId,
   );
   if (objectiveResult.isErr()) {
+    await context.logger.error(
+      "Failed to find objective",
+      objectiveResult.error,
+      { objectiveId: input.objectiveId, userId },
+    );
     return err(
       new ApplicationError("Failed to find objective", objectiveResult.error),
     );
@@ -31,6 +36,11 @@ export async function createKeyResult(
     userId,
   );
   if (canEditResult.isErr()) {
+    await context.logger.error(
+      "Failed to check edit permissions",
+      canEditResult.error,
+      { objectiveId: input.objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check edit permissions",
@@ -87,6 +97,11 @@ export async function createKeyResult(
   // Create key result
   const createResult = await context.okrRepository.createKeyResult(input);
   if (createResult.isErr()) {
+    await context.logger.error(
+      "Failed to create key result",
+      createResult.error,
+      { objectiveId: input.objectiveId, userId, title: input.title },
+    );
     return err(
       new ApplicationError("Failed to create key result", createResult.error),
     );

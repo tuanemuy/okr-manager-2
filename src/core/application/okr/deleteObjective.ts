@@ -15,6 +15,11 @@ export async function deleteObjective(
   const objectiveResult =
     await context.okrRepository.findObjectiveById(objectiveId);
   if (objectiveResult.isErr()) {
+    await context.logger.error(
+      "Failed to find objective",
+      objectiveResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError("Failed to find objective", objectiveResult.error),
     );
@@ -29,6 +34,11 @@ export async function deleteObjective(
     userId,
   );
   if (canEditResult.isErr()) {
+    await context.logger.error(
+      "Failed to check edit permissions",
+      canEditResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check edit permissions",
@@ -46,6 +56,11 @@ export async function deleteObjective(
   // Delete objective (this will cascade delete related key results)
   const deleteResult = await context.okrRepository.deleteObjective(objectiveId);
   if (deleteResult.isErr()) {
+    await context.logger.error(
+      "Failed to delete objective",
+      deleteResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError("Failed to delete objective", deleteResult.error),
     );

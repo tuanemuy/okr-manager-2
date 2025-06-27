@@ -59,11 +59,11 @@ export async function getTeamsData() {
   });
 
   if (result.isErr()) {
-    throw new Error("Failed to fetch teams");
+    return { items: [], count: 0 };
   }
 
   // Get user's role in each team
-  const teamsWithRole = await Promise.all(
+  const teamsWithRoleResults = await Promise.all(
     result.value.items.map(async (team) => {
       const memberResult = await context.teamRepository.findMember(
         team.id,
@@ -71,7 +71,7 @@ export async function getTeamsData() {
       );
 
       if (memberResult.isErr() || !memberResult.value) {
-        throw new Error(`Failed to fetch member info for team ${team.id}`);
+        return null;
       }
 
       const roleResult = await context.roleRepository.findRoleById(
@@ -79,7 +79,7 @@ export async function getTeamsData() {
       );
 
       if (roleResult.isErr() || !roleResult.value) {
-        throw new Error(`Failed to fetch role ${memberResult.value.roleId}`);
+        return null;
       }
 
       return {
@@ -88,6 +88,11 @@ export async function getTeamsData() {
         okrCount: team.activeOkrCount, // Use activeOkrCount as okrCount
       } as TeamWithStatsAndRole;
     }),
+  );
+
+  // Filter out null results from failed team processing
+  const teamsWithRole = teamsWithRoleResults.filter(
+    (team): team is TeamWithStatsAndRole => team !== null,
   );
 
   return {
@@ -109,13 +114,15 @@ type TeamDetailView = Team & {
   recentActivity: unknown[];
 };
 
-export async function getTeamData(teamId: string): Promise<TeamDetailView> {
+export async function getTeamData(
+  teamId: string,
+): Promise<TeamDetailView | null> {
   const user = await requireAuth();
 
   const result = await getTeam(context, { id: teamId, requesterId: user.id });
 
   if (result.isErr()) {
-    throw new Error("Failed to fetch team");
+    return null;
   }
 
   const team = result.value;
@@ -129,16 +136,16 @@ export async function getTeamData(teamId: string): Promise<TeamDetailView> {
   });
 
   if (membersResult.isErr()) {
-    throw new Error("Failed to fetch team members");
+    return null;
   }
 
   // Enrich members with user and role data
-  const membersWithDetails = await Promise.all(
+  const membersWithDetailsResults = await Promise.all(
     membersResult.value.items.map(async (member) => {
       // Get user details
       const userResult = await getUser(context, { id: member.userId });
       if (userResult.isErr()) {
-        throw new Error(`Failed to fetch user ${member.userId}`);
+        return null;
       }
 
       // Get role details
@@ -146,7 +153,7 @@ export async function getTeamData(teamId: string): Promise<TeamDetailView> {
         member.roleId,
       );
       if (roleResult.isErr()) {
-        throw new Error(`Failed to fetch role ${member.roleId}`);
+        return null;
       }
 
       return {
@@ -155,6 +162,11 @@ export async function getTeamData(teamId: string): Promise<TeamDetailView> {
         role: roleResult.value,
       };
     }),
+  );
+
+  // Filter out null results from failed member processing
+  const membersWithDetails = membersWithDetailsResults.filter(
+    (member): member is TeamMemberWithUserAndRole => member !== null,
   );
 
   // Fetch team objectives
@@ -169,7 +181,7 @@ export async function getTeamData(teamId: string): Promise<TeamDetailView> {
   );
 
   if (objectivesResult.isErr()) {
-    throw new Error("Failed to fetch team objectives");
+    return null;
   }
 
   // Calculate overall progress
@@ -393,7 +405,7 @@ export async function addTeamMemberAction(
 export async function removeTeamMemberAction(
   teamId: string,
   userId: string,
-): Promise<void> {
+): Promise<{ success: boolean; error?: string }> {
   const currentUser = await requireAuth();
 
   const result = await removeTeamMember(context, {
@@ -403,10 +415,11 @@ export async function removeTeamMemberAction(
   });
 
   if (result.isErr()) {
-    throw new Error("Failed to remove team member");
+    return { success: false, error: "Failed to remove team member" };
   }
 
   // Page will be refreshed by Next.js navigation
+  return { success: true };
 }
 
 export async function listTeamsAction(options?: {
@@ -439,7 +452,7 @@ export async function listTeamsAction(options?: {
   );
 
   if (result.isErr()) {
-    throw new Error("Failed to fetch teams");
+    return { items: [], count: 0 };
   }
 
   return result.value;

@@ -18,6 +18,9 @@ export async function logout(
   );
 
   if (deleteResult.isErr()) {
+    await context.logger.error("Failed to delete session", deleteResult.error, {
+      token: input.token,
+    });
     return err(
       new ApplicationError("Failed to delete session", deleteResult.error),
     );

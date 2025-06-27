@@ -20,6 +20,9 @@ export async function validateSession(
     input.token,
   );
   if (sessionResult.isErr()) {
+    await context.logger.error("Failed to find session", sessionResult.error, {
+      token: input.token,
+    });
     return err(
       new ApplicationError("Failed to find session", sessionResult.error),
     );
@@ -41,6 +44,10 @@ export async function validateSession(
   // Find user
   const userResult = await context.userRepository.findById(session.userId);
   if (userResult.isErr()) {
+    await context.logger.error("Failed to find user", userResult.error, {
+      userId: session.userId,
+      sessionId: session.id,
+    });
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 

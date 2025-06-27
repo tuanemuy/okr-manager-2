@@ -17,6 +17,9 @@ export async function deleteTeam(
   // Check if team exists
   const teamResult = await context.teamRepository.findById(input.id);
   if (teamResult.isErr()) {
+    await context.logger.error("Failed to find team", teamResult.error, {
+      teamId: input.id,
+    });
     return err(new ApplicationError("Failed to find team", teamResult.error));
   }
 
@@ -34,6 +37,10 @@ export async function deleteTeam(
   // Delete team (this should cascade delete members, invitations, etc.)
   const deleteResult = await context.teamRepository.delete(input.id);
   if (deleteResult.isErr()) {
+    await context.logger.error("Failed to delete team", deleteResult.error, {
+      teamId: input.id,
+      requesterId: input.requesterId,
+    });
     return err(
       new ApplicationError("Failed to delete team", deleteResult.error),
     );
