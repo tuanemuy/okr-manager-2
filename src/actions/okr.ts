@@ -48,7 +48,7 @@ export async function getObjectiveData(objectiveId: string) {
   const result = await getObjective(context, user.id, objectiveId);
 
   if (result.isErr()) {
-    throw new Error("Failed to fetch objective");
+    return null;
   }
 
   const objective = result.value;
@@ -208,16 +208,17 @@ export async function updateKeyResultAction(
 
 export async function deleteKeyResultAction(
   keyResultId: string,
-): Promise<void> {
+): Promise<{ success: boolean; error?: string }> {
   const user = await requireAuth();
 
   const result = await deleteKeyResult(context, user.id, keyResultId);
 
   if (result.isErr()) {
-    throw new Error("Failed to delete key result");
+    return { success: false, error: "Failed to delete key result" };
   }
 
   // Page will be refreshed by Next.js navigation
+  return { success: true };
 }
 
 export async function listObjectivesAction(options?: {
@@ -253,7 +254,7 @@ export async function listObjectivesAction(options?: {
   );
 
   if (result.isErr()) {
-    throw new Error("Failed to fetch objectives");
+    return { items: [], count: 0 };
   }
 
   return result.value;
@@ -265,7 +266,7 @@ export async function getOKRDashboardAction() {
   const result = await getOKRDashboard(context, user.id);
 
   if (result.isErr()) {
-    throw new Error("Failed to fetch OKR dashboard");
+    return null;
   }
 
   return result.value;

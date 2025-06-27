@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { BcryptPasswordHasher } from "@/core/adapters/bcrypt/passwordHasher";
+import { ConsoleLogger } from "@/core/adapters/console/logger";
 import { getDatabase } from "@/core/adapters/drizzleSqlite/client";
 import { DrizzleSqliteOkrRepository } from "@/core/adapters/drizzleSqlite/okrRepository";
 import { DrizzleSqliteRoleRepository } from "@/core/adapters/drizzleSqlite/roleRepository";
@@ -35,4 +36,5 @@ export const context: Context = {
   okrRepository: new DrizzleSqliteOkrRepository(db),
   passwordHasher: new BcryptPasswordHasher(),
   emailService: new MockEmailService(),
+  logger: new ConsoleLogger(),
 };

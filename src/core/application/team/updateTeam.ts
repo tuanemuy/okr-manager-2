@@ -20,6 +20,9 @@ export async function updateTeam(
   // Check if team exists
   const teamResult = await context.teamRepository.findById(input.id);
   if (teamResult.isErr()) {
+    await context.logger.error("Failed to find team", teamResult.error, {
+      teamId: input.id,
+    });
     return err(new ApplicationError("Failed to find team", teamResult.error));
   }
 
@@ -35,6 +38,11 @@ export async function updateTeam(
     input.requesterId,
   );
   if (memberResult.isErr()) {
+    await context.logger.error(
+      "Failed to check team membership",
+      memberResult.error,
+      { teamId: input.id, requesterId: input.requesterId },
+    );
     return err(
       new ApplicationError(
         "Failed to check team membership",
@@ -66,6 +74,10 @@ export async function updateTeam(
   });
 
   if (updateResult.isErr()) {
+    await context.logger.error("Failed to update team", updateResult.error, {
+      teamId: input.id,
+      requesterId: input.requesterId,
+    });
     return err(
       new ApplicationError("Failed to update team", updateResult.error),
     );

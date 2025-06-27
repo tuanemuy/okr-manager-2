@@ -22,6 +22,11 @@ export async function login(
     input.email,
   );
   if (userResult.isErr()) {
+    await context.logger.error(
+      "Failed to find user by email for auth",
+      userResult.error,
+      { email: input.email },
+    );
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 
@@ -37,6 +42,11 @@ export async function login(
     userWithAuth.hashedPassword,
   );
   if (verifyResult.isErr()) {
+    await context.logger.error(
+      "Failed to verify password",
+      verifyResult.error,
+      { userId: userWithAuth.id },
+    );
     return err(
       new ApplicationError("Failed to verify password", verifyResult.error),
     );
@@ -54,6 +64,11 @@ export async function login(
   });
 
   if (sessionResult.isErr()) {
+    await context.logger.error(
+      "Failed to create session",
+      sessionResult.error,
+      { userId: userWithAuth.id },
+    );
     return err(
       new ApplicationError("Failed to create session", sessionResult.error),
     );

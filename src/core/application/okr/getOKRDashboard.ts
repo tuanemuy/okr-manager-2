@@ -19,6 +19,11 @@ export async function getOKRDashboard(
       userId,
     );
     if (isMemberResult.isErr()) {
+      await context.logger.error(
+        "Failed to check team membership",
+        isMemberResult.error,
+        { teamId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check team membership",
@@ -37,6 +42,11 @@ export async function getOKRDashboard(
     teamId,
   );
   if (statsResult.isErr()) {
+    await context.logger.error(
+      "Failed to retrieve dashboard stats",
+      statsResult.error,
+      { userId, teamId },
+    );
     return err(
       new ApplicationError(
         "Failed to retrieve dashboard stats",

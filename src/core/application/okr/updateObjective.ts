@@ -17,6 +17,11 @@ export async function updateObjective(
   const objectiveResult =
     await context.okrRepository.findObjectiveById(objectiveId);
   if (objectiveResult.isErr()) {
+    await context.logger.error(
+      "Failed to find objective",
+      objectiveResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError("Failed to find objective", objectiveResult.error),
     );
@@ -33,6 +38,11 @@ export async function updateObjective(
     userId,
   );
   if (canEditResult.isErr()) {
+    await context.logger.error(
+      "Failed to check edit permissions",
+      canEditResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check edit permissions",
@@ -60,6 +70,11 @@ export async function updateObjective(
       userId,
     );
     if (isMemberResult.isErr()) {
+      await context.logger.error(
+        "Failed to check team membership",
+        isMemberResult.error,
+        { teamId: input.teamId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check team membership",
@@ -77,6 +92,11 @@ export async function updateObjective(
     const permissionsResult =
       await context.roleRepository.getUserPermissions(userId);
     if (permissionsResult.isErr()) {
+      await context.logger.error(
+        "Failed to check permissions",
+        permissionsResult.error,
+        { userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check permissions",
@@ -102,6 +122,11 @@ export async function updateObjective(
       input.parentId,
     );
     if (parentResult.isErr()) {
+      await context.logger.error(
+        "Failed to find parent objective",
+        parentResult.error,
+        { parentId: input.parentId, objectiveId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to find parent objective",
@@ -118,6 +143,11 @@ export async function updateObjective(
       userId,
     );
     if (canAccessResult.isErr()) {
+      await context.logger.error(
+        "Failed to check access to parent objective",
+        canAccessResult.error,
+        { parentId: input.parentId, objectiveId, userId },
+      );
       return err(
         new ApplicationError(
           "Failed to check access to parent objective",
@@ -142,6 +172,11 @@ export async function updateObjective(
   });
 
   if (updateResult.isErr()) {
+    await context.logger.error(
+      "Failed to update objective",
+      updateResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError("Failed to update objective", updateResult.error),
     );

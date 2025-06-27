@@ -21,6 +21,9 @@ export async function inviteToTeam(
   // Check if team exists
   const teamResult = await context.teamRepository.findById(input.teamId);
   if (teamResult.isErr()) {
+    await context.logger.error("Failed to find team", teamResult.error, {
+      teamId: input.teamId,
+    });
     return err(new ApplicationError("Failed to find team", teamResult.error));
   }
 
@@ -37,6 +40,11 @@ export async function inviteToTeam(
       input.requesterId,
     );
     if (requesterMemberResult.isErr()) {
+      await context.logger.error(
+        "Failed to check requester membership",
+        requesterMemberResult.error,
+        { teamId: input.teamId, requesterId: input.requesterId },
+      );
       return err(
         new ApplicationError(
           "Failed to check requester membership",
@@ -61,6 +69,11 @@ export async function inviteToTeam(
     input.email,
   );
   if (existingUserResult.isErr()) {
+    await context.logger.error(
+      "Failed to check existing user",
+      existingUserResult.error,
+      { email: input.email },
+    );
     return err(
       new ApplicationError(
         "Failed to check existing user",
@@ -76,6 +89,11 @@ export async function inviteToTeam(
       existingUserResult.value.id,
     );
     if (existingMemberResult.isErr()) {
+      await context.logger.error(
+        "Failed to check existing membership",
+        existingMemberResult.error,
+        { teamId: input.teamId, userId: existingUserResult.value.id },
+      );
       return err(
         new ApplicationError(
           "Failed to check existing membership",
@@ -107,6 +125,11 @@ export async function inviteToTeam(
   });
 
   if (createInvitationResult.isErr()) {
+    await context.logger.error(
+      "Failed to create invitation",
+      createInvitationResult.error,
+      { teamId: input.teamId, email: input.email, roleId: input.roleId },
+    );
     return err(
       new ApplicationError(
         "Failed to create invitation",
@@ -120,6 +143,11 @@ export async function inviteToTeam(
     input.requesterId,
   );
   if (requesterResult.isErr()) {
+    await context.logger.error(
+      "Failed to find requester",
+      requesterResult.error,
+      { requesterId: input.requesterId },
+    );
     return err(
       new ApplicationError("Failed to find requester", requesterResult.error),
     );
@@ -144,7 +172,11 @@ export async function inviteToTeam(
 
   if (emailResult.isErr()) {
     // Log error but don't fail invitation creation
-    console.error("Failed to send invitation email:", emailResult.error);
+    await context.logger.error(
+      "Failed to send invitation email",
+      emailResult.error,
+      { email: input.email, teamId: input.teamId },
+    );
   }
 
   return ok(createInvitationResult.value);

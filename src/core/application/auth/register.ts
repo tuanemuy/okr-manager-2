@@ -25,6 +25,11 @@ export async function register(
     input.email,
   );
   if (existingUserResult.isErr()) {
+    await context.logger.error(
+      "Failed to check existing user",
+      existingUserResult.error,
+      { email: input.email },
+    );
     return err(
       new ApplicationError(
         "Failed to check existing user",
@@ -42,6 +47,11 @@ export async function register(
     input.password,
   );
   if (hashedPasswordResult.isErr()) {
+    await context.logger.error(
+      "Failed to hash password",
+      hashedPasswordResult.error,
+      { email: input.email },
+    );
     return err(
       new ApplicationError(
         "Failed to hash password",
@@ -58,6 +68,11 @@ export async function register(
   });
 
   if (createUserResult.isErr()) {
+    await context.logger.error(
+      "Failed to create user",
+      createUserResult.error,
+      { email: input.email },
+    );
     return err(
       new ApplicationError("Failed to create user", createUserResult.error),
     );
@@ -74,7 +89,11 @@ export async function register(
 
   if (emailResult.isErr()) {
     // Log error but don't fail registration
-    console.error("Failed to send verification email:", emailResult.error);
+    await context.logger.error(
+      "Failed to send verification email",
+      emailResult.error,
+      { email: input.email },
+    );
   }
 
   return ok(createUserResult.value);

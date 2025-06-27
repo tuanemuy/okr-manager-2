@@ -19,6 +19,9 @@ export async function updateProfile(
   // Check if user exists
   const userResult = await context.userRepository.findById(input.id);
   if (userResult.isErr()) {
+    await context.logger.error("Failed to find user by id", userResult.error, {
+      userId: input.id,
+    });
     return err(new ApplicationError("Failed to find user", userResult.error));
   }
 
@@ -34,6 +37,11 @@ export async function updateProfile(
   });
 
   if (updateResult.isErr()) {
+    await context.logger.error(
+      "Failed to update user profile",
+      updateResult.error,
+      { userId: input.id },
+    );
     return err(
       new ApplicationError("Failed to update profile", updateResult.error),
     );

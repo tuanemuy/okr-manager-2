@@ -21,6 +21,11 @@ export async function updateKeyResult(
   const keyResultResult =
     await context.okrRepository.findKeyResultById(keyResultId);
   if (keyResultResult.isErr()) {
+    await context.logger.error(
+      "Failed to find key result",
+      keyResultResult.error,
+      { keyResultId, userId },
+    );
     return err(
       new ApplicationError("Failed to find key result", keyResultResult.error),
     );
@@ -37,6 +42,11 @@ export async function updateKeyResult(
     userId,
   );
   if (canEditResult.isErr()) {
+    await context.logger.error(
+      "Failed to check edit permissions",
+      canEditResult.error,
+      { objectiveId: keyResult.objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check edit permissions",
@@ -108,6 +118,11 @@ export async function updateKeyResult(
   });
 
   if (updateResult.isErr()) {
+    await context.logger.error(
+      "Failed to update key result",
+      updateResult.error,
+      { keyResultId, userId },
+    );
     return err(
       new ApplicationError("Failed to update key result", updateResult.error),
     );
@@ -126,6 +141,11 @@ export async function updateKeyResultProgress(
   const keyResultResult =
     await context.okrRepository.findKeyResultById(keyResultId);
   if (keyResultResult.isErr()) {
+    await context.logger.error(
+      "Failed to find key result",
+      keyResultResult.error,
+      { keyResultId, userId },
+    );
     return err(
       new ApplicationError("Failed to find key result", keyResultResult.error),
     );
@@ -142,6 +162,11 @@ export async function updateKeyResultProgress(
     userId,
   );
   if (canEditResult.isErr()) {
+    await context.logger.error(
+      "Failed to check edit permissions",
+      canEditResult.error,
+      { objectiveId: keyResult.objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check edit permissions",
@@ -186,6 +211,11 @@ export async function updateKeyResultProgress(
   });
 
   if (updateResult.isErr()) {
+    await context.logger.error(
+      "Failed to update key result progress",
+      updateResult.error,
+      { keyResultId, userId, currentValue: input.currentValue },
+    );
     return err(
       new ApplicationError(
         "Failed to update key result progress",

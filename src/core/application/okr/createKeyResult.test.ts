@@ -1,6 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { beforeEach, describe, expect, it } from "vitest";
 import { MockEmailService } from "@/core/adapters/mock/emailService";
+import { MockLogger } from "@/core/adapters/mock/logger";
 import { MockOkrRepository } from "@/core/adapters/mock/okrRepository";
 import { MockPasswordHasher } from "@/core/adapters/mock/passwordHasher";
 import { MockRoleRepository } from "@/core/adapters/mock/roleRepository";
@@ -27,6 +28,7 @@ describe("createKeyResult", () => {
       roleRepository: new MockRoleRepository(),
       okrRepository: mockOkrRepository,
       emailService: new MockEmailService(),
+      logger: new MockLogger(),
     };
 
     // Clear all mock data

@@ -21,6 +21,9 @@ export async function createTeam(
     input.createdById,
   );
   if (creatorResult.isErr()) {
+    await context.logger.error("Failed to find creator", creatorResult.error, {
+      createdById: input.createdById,
+    });
     return err(
       new ApplicationError("Failed to find creator", creatorResult.error),
     );
@@ -38,6 +41,10 @@ export async function createTeam(
   });
 
   if (createResult.isErr()) {
+    await context.logger.error("Failed to create team", createResult.error, {
+      name: input.name,
+      createdById: input.createdById,
+    });
     return err(
       new ApplicationError("Failed to create team", createResult.error),
     );

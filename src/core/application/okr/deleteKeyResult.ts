@@ -15,6 +15,11 @@ export async function deleteKeyResult(
   const keyResultResult =
     await context.okrRepository.findKeyResultById(keyResultId);
   if (keyResultResult.isErr()) {
+    await context.logger.error(
+      "Failed to find key result",
+      keyResultResult.error,
+      { keyResultId, userId },
+    );
     return err(
       new ApplicationError("Failed to find key result", keyResultResult.error),
     );
@@ -31,6 +36,11 @@ export async function deleteKeyResult(
     userId,
   );
   if (canEditResult.isErr()) {
+    await context.logger.error(
+      "Failed to check edit permissions",
+      canEditResult.error,
+      { objectiveId: keyResult.objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check edit permissions",
@@ -45,6 +55,11 @@ export async function deleteKeyResult(
   // Delete key result
   const deleteResult = await context.okrRepository.deleteKeyResult(keyResultId);
   if (deleteResult.isErr()) {
+    await context.logger.error(
+      "Failed to delete key result",
+      deleteResult.error,
+      { keyResultId, userId },
+    );
     return err(
       new ApplicationError("Failed to delete key result", deleteResult.error),
     );

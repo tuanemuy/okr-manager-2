@@ -18,6 +18,11 @@ export async function getObjective(
     userId,
   );
   if (canAccessResult.isErr()) {
+    await context.logger.error(
+      "Failed to check access permissions",
+      canAccessResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to check access permissions",
@@ -33,6 +38,11 @@ export async function getObjective(
   const objectiveResult =
     await context.okrRepository.findObjectiveWithKeyResults(objectiveId);
   if (objectiveResult.isErr()) {
+    await context.logger.error(
+      "Failed to retrieve objective",
+      objectiveResult.error,
+      { objectiveId, userId },
+    );
     return err(
       new ApplicationError(
         "Failed to retrieve objective",
